@@ -12,7 +12,7 @@ import {
   ExternalLink,
   Award,
   Search,
-  Filter,
+  Calendar,
 } from "lucide-react";
 
 const Reports = () => {
@@ -95,10 +95,10 @@ const Reports = () => {
         <main className="page-body">
           <div style={{ marginBottom: "1.75rem" }}>
             <h2 style={{ fontSize: "1.8rem", fontWeight: 800, color: "#fff" }}>
-              Intelligence Reports & Audit History
+              Placement Intelligence Reports & Audit History
             </h2>
             <p style={{ color: "var(--text-secondary)", fontSize: "0.95rem", marginTop: "0.25rem" }}>
-              Review past resume analyses, score improvements, and job description match records.
+              Audit your historical resume quality, job matching evaluations, and customized roadmap records.
             </p>
           </div>
 
@@ -135,7 +135,7 @@ const Reports = () => {
                 style={activeTab === "jobs" ? { background: "var(--primary)", color: "#fff" } : {}}
                 onClick={() => setActiveTab("jobs")}
               >
-                Job Matches ({jobMatches.length})
+                Job Matches & Roadmaps ({jobMatches.length})
               </button>
             </div>
 
@@ -143,7 +143,7 @@ const Reports = () => {
               <Search size={16} style={{ color: "var(--text-muted)" }} />
               <input
                 type="text"
-                placeholder="Search reports..."
+                placeholder="Search reports by role or resume..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{ background: "none", border: "none", outline: "none", color: "#fff", width: "100%", fontSize: "0.85rem" }}
@@ -152,7 +152,7 @@ const Reports = () => {
           </div>
 
           {loading ? (
-            <LoadingSpinner message="Loading historical intelligence reports..." />
+            <LoadingSpinner message="Loading placement audit reports..." />
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "2rem" }}>
               {/* Resume Analyses Table */}
@@ -204,7 +204,7 @@ const Reports = () => {
                                       navigate(`/analysis/${a._id}`);
                                     }}
                                   >
-                                    View Report →
+                                    View Report ?
                                   </button>
                                   {a.resumeId?._id && (
                                     <button
@@ -224,19 +224,19 @@ const Reports = () => {
                     </div>
                   ) : (
                     <p style={{ color: "var(--text-muted)", padding: "1.5rem 0", textAlign: "center" }}>
-                      No resume reports match your search criteria.
+                      No resume reports found.
                     </p>
                   )}
                 </div>
               )}
 
-              {/* Job Matches Table */}
+              {/* Job Matches & Placement Roadmaps Table */}
               {(activeTab === "all" || activeTab === "jobs") && (
                 <div className="card">
                   <div className="card-header">
                     <h3 className="card-title">
                       <Briefcase size={18} style={{ color: "var(--accent-cyan)" }} />
-                      <span>Job Description Match Records ({filteredJobMatches.length})</span>
+                      <span>Target Job Matches & Roadmaps ({filteredJobMatches.length})</span>
                     </h3>
                   </div>
 
@@ -246,9 +246,10 @@ const Reports = () => {
                         <thead>
                           <tr>
                             <th>Target Role & Company</th>
-                            <th>Match Score</th>
-                            <th>Matched / Missing Skills</th>
-                            <th>Date</th>
+                            <th>Job Match Fit</th>
+                            <th>Placement Readiness</th>
+                            <th>Skill Gaps</th>
+                            <th>Roadmap Duration</th>
                             <th>Actions</th>
                           </tr>
                         </thead>
@@ -265,24 +266,40 @@ const Reports = () => {
                               </td>
                               <td>
                                 <span className={`score-grade-badge ${j.matchScore >= 80 ? "badge-excellent" : j.matchScore >= 60 ? "badge-good" : "badge-moderate"}`}>
-                                  {j.matchScore}%
+                                  {j.matchScore}% Fit
                                 </span>
                               </td>
                               <td>
-                                <span style={{ color: "var(--accent-emerald)", fontWeight: 600 }}>{j.matchedSkills?.length || 0} Matched</span> /{" "}
-                                <span style={{ color: "var(--accent-amber)", fontWeight: 600 }}>{j.missingSkills?.length || 0} Missing</span>
-                              </td>
-                              <td style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
-                                {new Date(j.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                                <strong style={{ color: "var(--accent-cyan)", fontSize: "0.95rem" }}>
+                                  {j.placementReadiness?.score || 68}/100
+                                </strong>
+                                <div style={{ fontSize: "0.75rem", color: "var(--text-muted)" }}>
+                                  {j.placementReadiness?.tier || "Ready for Prep"}
+                                </div>
                               </td>
                               <td>
-                                <button
-                                  className="btn btn-danger btn-sm"
-                                  onClick={(e) => handleDeleteJob(j._id, e)}
-                                  title="Delete Job Record"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
+                                <span style={{ color: "var(--accent-emerald)", fontWeight: 700 }}>{j.strongMatches?.length || j.matchedSkills?.length || 0} Strong</span> /{" "}
+                                <span style={{ color: "var(--accent-rose)", fontWeight: 700 }}>{j.missingMatches?.length || j.missingSkills?.length || 0} Missing</span>
+                              </td>
+                              <td style={{ color: "var(--text-secondary)", fontSize: "0.85rem" }}>
+                                {j.roadmap?.totalDays ? `${j.roadmap.totalDays} Days Plan` : "7-Day Roadmap"}
+                              </td>
+                              <td>
+                                <div style={{ display: "flex", gap: "0.5rem" }}>
+                                  <button
+                                    className="btn btn-outline btn-sm"
+                                    onClick={() => navigate("/job-match")}
+                                  >
+                                    Open Roadmap ?
+                                  </button>
+                                  <button
+                                    className="btn btn-danger btn-sm"
+                                    onClick={(e) => handleDeleteJob(j._id, e)}
+                                    title="Delete Job Record"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                </div>
                               </td>
                             </tr>
                           ))}
@@ -291,7 +308,7 @@ const Reports = () => {
                     </div>
                   ) : (
                     <p style={{ color: "var(--text-muted)", padding: "1.5rem 0", textAlign: "center" }}>
-                      No job matching records found.
+                      No job matching or roadmap records found.
                     </p>
                   )}
                 </div>

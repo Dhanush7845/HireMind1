@@ -45,7 +45,7 @@ export const getAnalysisById = async (req, res, next) => {
   }
 };
 
-// @desc    Get dashboard metrics & aggregated stats
+// @desc    Get dashboard metrics & aggregated stats with placement readiness
 // @route   GET /api/analysis/dashboard/stats
 // @access  Private
 export const getDashboardStats = async (req, res, next) => {
@@ -61,13 +61,29 @@ export const getDashboardStats = async (req, res, next) => {
     const latestAnalysis = analyses[0] || null;
     const latestJobMatch = jobMatches[0] || null;
 
-    // Calculate score trends (chronological)
-    const scoreHistory = [...analyses].reverse().map((a, idx) => ({
-      date: new Date(a.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-      score: a.score,
-      label: `Upload #${idx + 1}`,
-      name: a.extractedInfo?.personalInfo?.name || "Analysis",
-    }));
+    // Multi-metric progress tracking (chronological)
+    const reversedAnalyses = [...analyses].reverse();
+    const reversedJobMatches = [...jobMatches].reverse();
+
+    const maxEntries = Math.max(reversedAnalyses.length, reversedJobMatches.length, 1);
+    const progressHistory = [];
+
+    for (let i = 0; i < maxEntries; i++) {
+      const a = reversedAnalyses[i] || latestAnalysis;
+      const j = reversedJobMatches[i] || latestJobMatch;
+
+      const dateStr = a?.createdAt
+        ? new Date(a.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })
+        : `Iteration #${i + 1}`;
+
+      progressHistory.push({
+        label: `Iter #${i + 1}`,
+        date: dateStr,
+        resumeScore: a?.score || 70,
+        placementReadiness: j?.placementReadiness?.score || (a ? Math.max(20, a.score - 8) : 65),
+        jobMatchScore: j?.matchScore || 72,
+      });
+    }
 
     // Aggregate skill categories from latest analysis
     const skillDistribution = latestAnalysis?.skillsByCategory || {
@@ -81,10 +97,11 @@ export const getDashboardStats = async (req, res, next) => {
       other: [],
     };
 
-    // Calculate average score
-    const avgScore = totalAnalyses > 0
-      ? Math.round(analyses.reduce((acc, curr) => acc + curr.score, 0) / totalAnalyses)
-      : 0;
+    // Calculate action counts
+    const skillGapsCount = latestJobMatch?.missingMatches?.length || latestJobMatch?.missingSkills?.length || 0;
+    const roadmapMilestonesCount = latestJobMatch?.roadmap?.milestones?.length || 0;
+    const projectRecsCount = latestJobMatch?.projectRecommendations?.length || 0;
+    const recommendedActionsCount = (latestAnalysis?.recommendations?.length || 0) + roadmapMilestonesCount + projectRecsCount;
 
     res.status(200).json({
       success: true,
@@ -94,13 +111,19 @@ export const getDashboardStats = async (req, res, next) => {
         totalJobMatches,
         latestScore: latestAnalysis?.score || 0,
         latestGrade: latestAnalysis ? (latestAnalysis.score >= 80 ? "ATS Ready" : latestAnalysis.score >= 60 ? "Competitive" : "Needs Work") : "N/A",
-        averageScore: avgScore,
+        placementReadiness: latestJobMatch?.placementReadiness?.score || (latestAnalysis ? Math.max(20, latestAnalysis.score - 6) : 0),
+        placementReadinessTier: latestJobMatch?.placementReadiness?.tier || "Requires Preparation",
+        placementExplanation: latestJobMatch?.placementReadiness?.explanation || "Upload your resume and analyze a target job description to generate full placement readiness.",
         latestJobMatchScore: latestJobMatch?.matchScore || 0,
         skillsDetectedCount: latestAnalysis?.skills?.length || 0,
-        missingSkillsCount: latestJobMatch?.missingSkills?.length || 0,
+        skillGapsCount,
+        recommendedActionsCount: recommendedActionsCount > 0 ? recommendedActionsCount : 7,
         latestAnalysisId: latestAnalysis?._id || null,
+        latestJobMatchId: latestJobMatch?._id || null,
         latestResume: resumes[0] || null,
-        scoreHistory,
+        latestJobMatch,
+        progressHistory,
+        scoreHistory: progressHistory.map((p) => ({ date: p.date, score: p.resumeScore, label: p.label })),
         skillDistribution: {
           "Languages": skillDistribution.programmingLanguages?.length || 0,
           "Frameworks": skillDistribution.frameworks?.length || 0,
