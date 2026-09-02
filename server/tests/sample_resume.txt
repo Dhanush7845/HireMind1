@@ -1,0 +1,41 @@
+Alex Morgan
+alex.morgan@example.com | +1 (555) 234-5678 | San Francisco, CA
+https://linkedin.com/in/alexmorgan | https://github.com/alexmorgan | https://alexmorgan.dev
+
+PROFESSIONAL SUMMARY
+Results-driven Full Stack Software Engineer with 3+ years of experience engineering scalable microservices and responsive web applications using React, Node.js, TypeScript, PostgreSQL, and AWS.
+
+EDUCATION
+Bachelor of Technology in Computer Science & Engineering
+Stanford University | 2020 - 2024 | CGPA: 9.2 / 10
+
+TECHNICAL SKILLS
+* Programming Languages: JavaScript, TypeScript, Python, Java, SQL, C++, HTML5, CSS3
+* Frameworks & Libraries: React, Node.js, Express.js, Next.js, Tailwind CSS, Redux
+* Databases & Caching: PostgreSQL, MongoDB, Redis, MySQL
+* Cloud & DevOps: AWS (EC2, S3, Lambda), Docker, Kubernetes, CI/CD, Git, GitHub Actions, Linux
+* Core CS & Methodologies: Data Structures & Algorithms, Object-Oriented Programming (OOP), System Design, REST API, Microservices
+
+WORK EXPERIENCE
+Software Engineering Intern at TechNova Inc | Jun 2023 - Dec 2023
+* Architected real-time WebSocket communication service in Node.js and Redis handling 50,000 concurrent sessions, reducing event broadcast latency by 40%.
+* Developed responsive React frontend user interfaces with 95% unit test coverage using Jest.
+* Deployed containerized microservices to AWS ECS using Docker and configured continuous integration pipelines.
+
+Software Engineering Intern at CloudPulse Solutions | Jan 2023 - May 2023
+* Engineered automated REST API endpoints in Express.js and PostgreSQL for customer billing processing.
+* Optimized SQL query execution plans, boosting database throughput by 32%.
+
+TECHNICAL PROJECTS
+HireMind - AI-Powered Resume Intelligence Platform | React, Node.js, MongoDB, Docker
+* Engineered deterministic ATS compatibility scoring algorithm analyzing resumes across 8 key recruiter metrics.
+* Implemented PDF & DOCX text parsing engine with normalized skill taxonomy covering 500+ technologies.
+* Deployed containerized stack on AWS cloud infrastructure.
+
+CloudStream - Distributed Media Pipeline | Python, Go, AWS, Docker, PostgreSQL
+* Built scalable distributed video processing pipeline utilizing AWS S3 and message queues.
+* Implemented REST APIs and automated Docker container builds.
+
+CERTIFICATIONS
+* AWS Certified Solutions Architect Associate - Amazon Web Services (AWS)
+* Meta Certified Frontend Developer - Coursera
